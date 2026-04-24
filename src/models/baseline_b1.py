@@ -8,27 +8,27 @@ Baseline B1-tuned
 ● Compute the results. This is your first model
 """
 
-import torch
 import torch.nn as nn
 import torchvision.models as models
+import torch
 
 
-class BaselineB1(nn.Module):
+class BaselineB1ResNet(nn.Module):
     def __init__(self, num_classes=8, fine_tune_all=True):
-        super(BaselineB1, self).__init__()
+        super(BaselineB1ResNet, self).__init__()
 
-        # 1. Load the pre-trained ResNet50 architecture and ImageNet weights
+        # Load the pre-trained ResNet50
         self.model = models.resnet50(weights=models.ResNet50_Weights.DEFAULT)
 
-        # 2. Optional: Freeze the backbone to ONLY train the new final layer
+        # Optional: Freeze the backbone
         if not fine_tune_all:
             for param in self.model.parameters():
                 param.requires_grad = False
 
-        # 3. Get the number of input features going into the existing 'fc' layer (which is 2048 for ResNet50)
+        # Get the number of input features going into the 'fc' layer
         num_ftrs = self.model.fc.in_features
 
-        # 4. Replace the final fully connected layer with a new one for your 8 classes
+        # Replace the 1000-class layer with an 8-class layer
         self.model.fc = nn.Linear(num_ftrs, num_classes)
 
     def forward(self, x):
@@ -36,7 +36,7 @@ class BaselineB1(nn.Module):
 
 
 if __name__ == "__main__":
-    model = BaselineB1()
+    model = BaselineB1ResNet()
     dummy_input = torch.randn(1, 3, 224, 224)
     output = model(dummy_input)
     print(output.shape)
