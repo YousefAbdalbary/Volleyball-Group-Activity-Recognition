@@ -1,10 +1,16 @@
 import os
+import sys
 import pickle
 import torch
 from PIL import Image
 from torch.utils.data import Dataset
 import torchvision.transforms as transforms
 
+# --- THE PICKLE FIX ---
+# Tell Python to look inside the 'utils' folder right next to this file
+# so pickle knows what the 'BoxInfo' class is when it loads the cache.
+sys.path.append(os.path.join(os.path.dirname(__file__), 'utils'))
+# ----------------------
 
 class VolleyballDataset(Dataset):
     def __init__(
@@ -20,8 +26,7 @@ class VolleyballDataset(Dataset):
             data_root (str): The root path to your 'data/' folder.
             pkl_file (str): The path to your generated 'annot_all.pkl' file.
             split_video_ids (list): A list of video IDs (strings) to include in this dataset.
-                                    This allows you to separate Train vs Validation sets.
-            video_dir_name (str): The name of the folder containing the JPGs (e.g., 'sample' or 'videos').
+            video_dir_name (str): The name of the folder containing the JPGs (e.g., 'sample' or 'videos_sample').
             transform (callable, optional): Optional transform to be applied on an image.
         """
         self.data_root = data_root
@@ -50,7 +55,6 @@ class VolleyballDataset(Dataset):
         print(f"Loaded {len(self.clip_list)} clips for this dataset split.")
 
         # 2. Map the exact string labels from the text files to integers (0-7)
-        # We use Dr. Mostafa's exact mapping to ensure compatibility.
         self.category_to_idx = {
             "l-pass": 0,
             "r-pass": 1,
@@ -69,8 +73,7 @@ class VolleyballDataset(Dataset):
     def _clean_label(self, raw_label):
         """
         Helper function to normalize the raw string labels.
-        The dataset text files sometimes use spaces, sometimes dashes.
-        This forces them to match our dictionary keys exactly.
+        Forces them to match our dictionary keys exactly.
         """
         label = (
             raw_label.strip()
@@ -111,7 +114,6 @@ class VolleyballDataset(Dataset):
         )
 
         # Load the image
-        # If the image is missing (which happens in large datasets), we throw a clear error
         if not os.path.exists(img_path):
             raise FileNotFoundError(f"Missing image file: {img_path}")
 
@@ -125,7 +127,7 @@ class VolleyballDataset(Dataset):
         clean_label_str = self._clean_label(clip_info["category"])
         label_idx = self.category_to_idx[clean_label_str]
 
-        # PyTorch DataLoaders expect exactly this: a tuple of (Tensor, Integer)
+        # Return tuple of (Tensor, Integer)
         return image, label_idx
 
 
@@ -133,15 +135,17 @@ class VolleyballDataset(Dataset):
 # TEST BLOCK: Run this to verify your code!
 # ==========================================
 if __name__ == "__main__":
-    # 1. Define your paths based on your specific Ubuntu machine
-
+    # 1. Define your paths based on your environment
     if os.path.exists("/kaggle/working"):
-        DATA_ROOT = "/kaggle/input/volleyball-dataset"  # Update this to match the exact Kaggle dataset name
+        DATA_ROOT = "/kaggle/input/datasets/sherif31/group-activity-recognition-volleyball"
         OUTPUT_ROOT = "/kaggle/working"
+        PKL_FILE = os.path.join(DATA_ROOT, "annot_all.pkl")
+        VIDEOS_DIR_NAME = "videos_sample"
     else:
         DATA_ROOT = "/media/yousef-abdalbary/NewVolume/download/Deep Learning/volleyball_project/data"
         OUTPUT_ROOT = DATA_ROOT
-    PKL_FILE = os.path.join(DATA_ROOT, "annotations", "annot_all.pkl")
+        PKL_FILE = os.path.join(DATA_ROOT, "annotations", "annot_all.pkl")
+        VIDEOS_DIR_NAME = "sample"
 
     # 2. Define standard ImageNet transforms for ResNet50
     test_transform = transforms.Compose(
@@ -153,16 +157,21 @@ if __name__ == "__main__":
         ]
     )
 
-    # 3. Create a fake "split" using whatever video folders exist in your sample directory
-    sample_videos_path = os.path.join(DATA_ROOT, "sample")
-    available_videos = [
-        d
-        for d in os.listdir(sample_videos_path)
-        if os.path.isdir(os.path.join(sample_videos_path, d))
-    ]
+    # 3. Create a fake "split" using whatever video folders exist in your directory
+    sample_videos_path = os.path.join(DATA_ROOT, VIDEOS_DIR_NAME)
+    
+    if not os.path.exists(sample_videos_path):
+        print(f"Error: Could not find video path {sample_videos_path}")
+        available_videos = []
+    else:
+        available_videos = [
+            d
+            for d in os.listdir(sample_videos_path)
+            if os.path.isdir(os.path.join(sample_videos_path, d))
+        ]
 
     if not available_videos:
-        print("Error: No video folders found in data/sample/")
+        print(f"Error: No video folders found in {sample_videos_path}")
     elif not os.path.exists(PKL_FILE):
         print(
             f"Error: {PKL_FILE} not found. Did you run the create_pkl_version() function in your loader script?"
@@ -175,7 +184,7 @@ if __name__ == "__main__":
             data_root=DATA_ROOT,
             pkl_file=PKL_FILE,
             split_video_ids=available_videos,
-            video_dir_name="sample",  # Pointing to 'sample' instead of 'videos' for local testing
+            video_dir_name=VIDEOS_DIR_NAME,
             transform=test_transform,
         )
 
