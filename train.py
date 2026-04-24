@@ -57,7 +57,18 @@ def main():
         print(f"Error: Directory {available_videos_path} does not exist. Check Kaggle paths.")
         return
 
-    available_videos = [d for d in os.listdir(available_videos_path) if os.path.isdir(os.path.join(available_videos_path, d))]
+    # --- KAGGLE NESTED FOLDER FIX ---
+    # Sometimes Kaggle zips create nested folders like `videos_sample/videos_sample`
+    subdirs = [d for d in os.listdir(available_videos_path) if os.path.isdir(os.path.join(available_videos_path, d))]
+    
+    # If the only thing inside videos_sample is ANOTHER videos_sample folder... plunge deeper!
+    if len(subdirs) == 1 and subdirs[0] in [VIDEOS_DIR_NAME, "videos", "videos_sample"]:
+        print(f"⚠️ Detected nested Kaggle directory structure. Adjusting path deeper into '{subdirs[0]}'...")
+        VIDEOS_DIR_NAME = os.path.join(VIDEOS_DIR_NAME, subdirs[0])
+        available_videos_path = os.path.join(DATA_ROOT, VIDEOS_DIR_NAME)
+        subdirs = [d for d in os.listdir(available_videos_path) if os.path.isdir(os.path.join(available_videos_path, d))]
+    
+    available_videos = subdirs
 
     # Filter the available videos into train and val lists
     train_video_ids = [vid for vid in available_videos if vid in TRAIN_IDS]
