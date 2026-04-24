@@ -155,7 +155,7 @@ def main():
     model = model.to(device)
 
     criterion = nn.CrossEntropyLoss()
-    optimizer = optim.Adam(model.parameters(), lr=LEARNING_RATE)
+    optimizer = optim.AdamW(model.parameters(), lr=LEARNING_RATE)
 
     best_val_accuracy = 0.0
 
