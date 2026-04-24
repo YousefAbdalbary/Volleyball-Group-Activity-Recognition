@@ -10,11 +10,10 @@ from src.dataset import VolleyballDataset
 from src.models.baseline_b1 import BaselineB1ResNet
 
 # --- 1. CONFIGURATION & PATHS ---
-
 if os.path.exists("/kaggle/working"):
     print("Running on Kaggle...")
-    # Exact name of your dataset slug
-    DATA_ROOT = "/kaggle/input/group-activity-recognition-volleyball"
+    # EXACT PATH PLUGGED IN HERE:
+    DATA_ROOT = "/kaggle/input/datasets/sherif31/group-activity-recognition-volleyball"
     OUTPUT_ROOT = "/kaggle/working"
 
     # Based on your Kaggle screenshot, the PKL is in the root of the dataset
