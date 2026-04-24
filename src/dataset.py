@@ -30,6 +30,7 @@ class VolleyballDataset(Dataset):
 
         # 1. Flatten the nested dictionary into a simple list so PyTorch can index it easily.
         self.clip_list = []
+        print(f"⚠️ DEBUG: We were asked to search for these video IDs: {split_video_ids}")
         for vid in split_video_ids:
             # --- TYPE MISMATCH FIX ---
             # Check if the video ID exists as a string OR an integer in the PKL file
@@ -40,6 +41,7 @@ class VolleyballDataset(Dataset):
                 clip_dict = self.annotations[int(vid)]
 
             if clip_dict is not None:
+                print(f"⚠️ DEBUG: PKL entry for video '{vid}' contains {len(clip_dict)} clips.")
                 for clip_id, clip_data in clip_dict.items():
                     self.clip_list.append(
                         {
@@ -49,6 +51,8 @@ class VolleyballDataset(Dataset):
                             "frames": list(clip_data["frame_boxes_dct"].keys()),
                         }
                     )
+            else:
+                print(f"⚠️ DEBUG: Video '{vid}' was NOT found in the PKL file keys!")
         
         # Debugging print to help us if it is still 0
         if len(self.clip_list) == 0:
