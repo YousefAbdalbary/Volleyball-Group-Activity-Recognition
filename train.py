@@ -9,22 +9,18 @@ import torchvision.transforms as transforms
 from src.dataset import VolleyballDataset
 from src.models.baseline_b1 import BaselineB1ResNet
 
-# --- 1. CONFIGURATION & PATHS ---
 if os.path.exists("/kaggle/working"):
     print("Running on Kaggle...")
-    # EXACT PATH PLUGGED IN HERE:
     DATA_ROOT = "/kaggle/input/datasets/sherif31/group-activity-recognition-volleyball"
     OUTPUT_ROOT = "/kaggle/working"
-
-    # Based on your Kaggle dataset, the PKL is in the root
     PKL_FILE = os.path.join(DATA_ROOT, "annot_all.pkl")
 
-    # --- KAGGLE NESTED FOLDER FIX ---
-    # Point directly to the nested folder where the video numbers actually live
-    VIDEOS_DIR_NAME = "videos_sample/videos_sample"
-
-    # NOTE: When you are ready to train on the full 50GB dataset, check if it
-    # is also nested! You might need to change this to "videos/videos"
+    # --- UPGRADED TO FULL DATASET ---
+    # Automatically checks if the massive 'videos' folder is nested
+    if os.path.exists(os.path.join(DATA_ROOT, "videos", "videos")):
+        VIDEOS_DIR_NAME = "videos/videos"
+    else:
+        VIDEOS_DIR_NAME = "videos"
     # --------------------------------
 else:
     print("Running on Local Ubuntu...")
