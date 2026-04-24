@@ -1,0 +1,16 @@
+# Deep Learning Data & Checkpoints
+data/
+*.pkl
+*.npy
+*.pth
+*.pt
+
+# Python Caches
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# OS & IDE Files
+.DS_Store
+.vscode/
+.idea/
