@@ -31,6 +31,46 @@ class FeatureDataset(Dataset):
 
         # 2. Find all the .pt files in the directory
         self.pt_files = [f for f in os.listdir(features_dir) if f.endswith(".pt")]
+        """
+        where is features_dir ??
+        features_dir is the directory that contains the .pt files
+        it is like this:
+        /media/yousef-abdalbary/NewVolume/download/Deep Learning/volleyball_project/data/features/train
+        /media/yousef-abdalbary/NewVolume/download/Deep Learning/volleyball_project/data/features/val
+
+        what is pt_files ??
+        pt_files is a list of all the .pt files in the features_dir
+        like this:
+        [
+            "7_93635.pt",
+            "7_93636.pt",
+            "7_93637.pt",
+            "7_93638.pt",
+            "7_93639.pt",
+            "7_93640.pt",
+            "7_93641.pt",
+            "7_93642.pt",
+            "7_93643.pt",
+            "7_93644.pt",
+        ]
+
+        where each come from (as result of code)??
+            features_dir --> /media/yousef-abdalbary/NewVolume/download/Deep Learning/volleyball_project/data/features/train
+            pt_files --> [f for f in os.listdir(features_dir) if f.endswith(".pt")]
+
+            what use of features_dir is this code?
+            --> it is the directory that contains the .pt files
+            --> it is the directory that contains the features of the players
+            
+            how it cotain both ?
+            --> because it is the output of the extract_features.py file
+            
+            what is the output of the extract_features.py file?
+            --> it is the directory that contains the .pt files
+            --> it is the directory that contains the features of the players
+    
+            
+        """
         self.data_list = []
 
         for pt_file in self.pt_files:
