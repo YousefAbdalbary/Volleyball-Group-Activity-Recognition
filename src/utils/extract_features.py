@@ -86,6 +86,16 @@ def prepare_model(image_level=False):
 def extract_features(
     clip_dir_path, annot_file, output_file, model, preprocess, device, image_level=False
 ):
+    """
+    what is he goal of extract_features function ??
+    --> it is to extract the features of the players in the clip
+
+    what is this mean ??
+    it mean that we will take the middle frame of the clip
+    and extract the features of the players in the clip
+    and save them to a file
+
+    """
     frame_boxes = load_tracking_annot(annot_file)
 
     with torch.no_grad():

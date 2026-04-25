@@ -202,7 +202,14 @@ class FeatureDataset(Dataset):
 
   
             """
-            if clip_dict and clip_str in clip_dict:
+            if clip_dict:
+                # FIX: Check if the key exists as a string OR as an integer
+                if clip_str in clip_dict:
+                    raw_label = clip_dict[clip_str]["category"]
+                elif int(clip_str) in clip_dict:
+                    raw_label = clip_dict[int(clip_str)]["category"]
+                else:
+                    continue  # Could not find the clip in annotations
                 """
                 explain::
                 clip_dict[clip_str] is like this:
